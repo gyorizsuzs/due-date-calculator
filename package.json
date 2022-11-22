@@ -1,0 +1,26 @@
+{
+  "name": "due-date-calculator-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "calculateDueDate.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gyorizsuzs/due-date-calculator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gyorizsuzs/due-date-calculator/issues"
+  },
+  "homepage": "https://github.com/gyorizsuzs/due-date-calculator#readme",
+  "devDependencies": {
+    "jest": "^29.3.1"
+  },
+  "dependencies": {
+    "jest-environment-jsdom": "^29.3.1"
+  }
+}
