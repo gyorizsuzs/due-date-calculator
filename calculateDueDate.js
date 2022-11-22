@@ -1,11 +1,13 @@
-// BASE LOGIC
+`use strict`;
 
-// DATA
-// workingHours = start(9), end(17)
+/*******************************************/
+
+/*                   Data                  */
+
+/*******************************************/
+
 const startingHour = 9;
 const finishingHour = 17;
-
-// isWorkDay + isWorkHour = isWorkTime
 
 function isWorkDay(date) {
   return date.getDay() >= 1 && date.getDay() <= 5;
@@ -24,8 +26,6 @@ function isWorkTime(submitDate) {
   );
 }
 
-// weekDay(+1)
-
 function addDay(date) {
   date.setDate(date.getDate() + 1);
 }
@@ -39,9 +39,6 @@ function addWeekDay(date, days) {
     }
   }
 }
-
-// calcEstimate = start + TAT
-// if !sameDay
 
 function nextDay(date) {
   addWeekDay(date, 1);
@@ -57,8 +54,11 @@ function getRemainderTime(date) {
   return day.getTime() - date.getTime();
 }
 
-// MAIN FUNCTION
-// CalculateDueDate(submitDate, TurnaroundTime, estimatedSolutionDate)
+/*******************************************/
+
+/*               Main Logic                */
+
+/*******************************************/
 
 function calculateDueDate(submitDate, turnaroundTime) {
   let estimation = new Date(submitDate);
@@ -81,7 +81,11 @@ function calculateDueDate(submitDate, turnaroundTime) {
   return estimation;
 }
 
-// EXAMPLES
+/*******************************************/
+
+/*                Examples                 */
+
+/*******************************************/
 
 let exampleValidSubmit = new Date(Date.UTC(2022, 10, 22, 9, 1));
 let exampleInvalidSubmit = new Date(Date.UTC(2022, 10, 22, 8, 59));
