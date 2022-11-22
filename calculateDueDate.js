@@ -14,7 +14,14 @@ function isWorkDay(date) {
 }
 
 function isWorkHour(date) {
-  return date.getHours() >= startingHour && date.getHours() <= finishingHour;
+  return (
+    date.getHours() >= startingHour &&
+    (date.getHours() < finishingHour ||
+      (date.getHours() === finishingHour &&
+        date.getMinutes() === 0 &&
+        date.getSeconds() === 0 &&
+        date.getMilliseconds() === 0))
+  );
 }
 
 function isWorkTime(submitDate) {
@@ -44,12 +51,16 @@ function nextDay(date) {
   addWeekDay(date, 1);
   date.setHours(startingHour);
   date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
 }
 
 function getRemainderTime(date) {
   let day = new Date(date);
   day.setHours(finishingHour);
   day.setMinutes(0);
+  day.setSeconds(0);
+  day.setMilliseconds(0);
 
   return day.getTime() - date.getTime();
 }
@@ -62,108 +73,23 @@ function getRemainderTime(date) {
 
 function calculateDueDate(submitDate, turnaroundTime) {
   let estimation = new Date(submitDate);
-  let turnaroundMinutes = turnaroundTime * 60;
+  let turnaroundMSs = turnaroundTime * 60 * 60 * 1000;
 
-  if (!isWorkTime(submitDate) || isNaN(turnaroundTime) || turnaroundTime < 0)
+  if (!isWorkTime(submitDate) || isNaN(turnaroundTime) || turnaroundTime <= 0)
     throw new Error('Cannot submit: invalid request.');
 
-  while (turnaroundMinutes > 0) {
+  while (turnaroundMSs > 0) {
     let remainderTime = getRemainderTime(estimation);
-    let workingTime = Math.min(remainderTime, turnaroundMinutes);
+    let workingTime = Math.min(remainderTime, turnaroundMSs);
 
     estimation.setTime(estimation.getTime() + workingTime);
 
-    turnaroundMinutes = turnaroundMinutes - workingTime;
-    if (turnaroundMinutes > 0) {
+    turnaroundMSs = turnaroundMSs - workingTime;
+    if (turnaroundMSs > 0) {
       nextDay(estimation);
     }
   }
   return estimation;
-}
-
-/*******************************************/
-
-/*                Examples                 */
-
-/*******************************************/
-
-let exampleValidSubmit = new Date(Date.UTC(2022, 10, 22, 9, 1));
-let exampleInvalidSubmit = new Date(Date.UTC(2022, 10, 22, 8, 59));
-let exampleValidTAT = 8;
-let exampleValidTAT2 = 9;
-let exampleInvalidTAT = 0;
-let exampleInvalidTAT2 = -1; // ✅
-
-console.log(
-  `Issue has been submitted at ${exampleValidSubmit.toLocaleString()}\nThe turnaround time is ${exampleValidTAT} hours\n`
-);
-try {
-  let exampleEstimation = calculateDueDate(exampleValidSubmit, exampleValidTAT);
-  console.log(
-    `The estimated due date is ${exampleEstimation.toLocaleString()}`
-  );
-} catch (err) {
-  console.log(`Error has occured during calculation. ${err}`);
-}
-
-console.log(
-  `Issue has been submitted at ${exampleInvalidSubmit.toLocaleString()}\nThe turnaround time is ${exampleValidTAT} hours\n`
-);
-try {
-  let exampleEstimation = calculateDueDate(
-    exampleInvalidSubmit,
-    exampleValidTAT
-  );
-  console.log(
-    `The estimated due date is ${exampleEstimation.toLocaleString()}`
-  );
-} catch (err) {
-  console.log(`Error has occured during calculation. ${err}`);
-}
-
-console.log(
-  `Issue has been submitted at ${exampleValidSubmit.toLocaleString()}\nThe turnaround time is ${exampleValidTAT2} hours\n`
-);
-try {
-  let exampleEstimation = calculateDueDate(
-    exampleValidSubmit,
-    exampleValidTAT2
-  );
-  console.log(
-    `The estimated due date is ${exampleEstimation.toLocaleString()}`
-  );
-} catch (err) {
-  console.log(`Error has occured during calculation. ${err}`);
-}
-
-console.log(
-  `Issue has been submitted at ${exampleValidSubmit.toLocaleString()}\nThe turnaround time is ${exampleInvalidTAT} hours\n`
-);
-try {
-  let exampleEstimation = calculateDueDate(
-    exampleValidSubmit,
-    exampleInvalidTAT
-  );
-  console.log(
-    `The estimated due date is ${exampleEstimation.toLocaleString()}`
-  );
-} catch (err) {
-  console.log(`Error has occured during calculation. ${err}`);
-}
-
-console.log(
-  `Issue has been submitted at ${exampleValidSubmit.toLocaleString()}\nThe turnaround time is ${exampleInvalidTAT2} hours\n`
-);
-try {
-  let exampleEstimation = calculateDueDate(
-    exampleValidSubmit,
-    exampleInvalidTAT2
-  );
-  console.log(
-    `The estimated due date is ${exampleEstimation.toLocaleString()}`
-  );
-} catch (err) {
-  console.log(`Error has occured during calculation. ${err}`);
 }
 
 module.exports = calculateDueDate;
